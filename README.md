@@ -1,6 +1,7 @@
-<p align="center">
+<p alighn=""center> # MicroKart </p>
   
-  # MicroKart
+
+<p align="center">
   
   <img src="resources/sprite_itemmushroom.png" alt="MicroKart icon" width="72">
 </p>
