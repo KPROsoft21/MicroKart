@@ -3,7 +3,7 @@
 
 <p align="center">
   
-  <img src="resources/sprite_itemmushroom.png" alt="MicroKart icon" width="72">
+  <img src="resources/sprite_itemmushroom.png" alt="MicroKart icon" width="144" height=auto>
 </p>
 
 <p align="center">
