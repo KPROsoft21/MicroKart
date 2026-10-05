@@ -102,6 +102,4 @@ This is a modernized version of an older Python 2 game. The current build includ
 
 ## Credits
 
-Created by **kprosoft21**.
-
-Original Python 2 game by **Zanapher**. This is an improved version of his game.
+Original Python 2 game by **Zanapher**. Recreated by **kprosoft21** for python 3.
