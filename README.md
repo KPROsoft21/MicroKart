@@ -27,6 +27,7 @@ This improved version updates the original Python 2 project so it can run on mod
 - 2D kart racing with sprite-based racers and track graphics
 - Local two-player controls
 - CPU-controlled racers using track beacon navigation
+- Start countdown and pause support
 - Item pickups and usable power-ups
 - Multiple track and character assets
 - Zoomable race view
@@ -75,6 +76,7 @@ Additional controls:
 | Key | Action |
 | --- | --- |
 | Z | Change zoom |
+| P | Pause or resume |
 | F3 | Save screenshot |
 | 1-8 | Give Player 1 a test item |
 | T | Spin Player 1 |

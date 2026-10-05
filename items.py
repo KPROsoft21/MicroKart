@@ -36,7 +36,7 @@ class PowerUpBanana(PowerUp):
     def on_use(self, race, racer, alternate):
         safe_distance = 8 + racer.car.radius()  # the radius of a banana is 4
         position = racer.car.position - racer.car.get_direction_vector().normalize(safe_distance)
-        if not race.track.type(position) in [WALL, DEEP]:
+        if race.track.type(position) not in [WALL, DEEP]:
             # banana cannot appear in deep ground or wall
             return ParticleBanana(race, position)
 
@@ -64,7 +64,7 @@ class PowerUpGreenShell(PowerUp):
             position = racer.car.position + racer.car.get_direction_vector().normalize(safe_distance)
             direction = racer.car.direction
             speed = max(racer.car.speed.norm() + 50, 200)
-        if not race.track.type(position) in [WALL, DEEP]:
+        if race.track.type(position) not in [WALL, DEEP]:
             # sheel cannot appear on deep ground or wall
             return ParticleGreenShell(race, position, direction, speed)
 
@@ -83,7 +83,7 @@ class PowerUpRedShell(PowerUp):
             target = None  # racer is in first place, no target
         else:
             target = race.racers[rank - 1].car  # target the car in front
-        if not race.track.type(position) in [WALL, DEEP]:
+        if race.track.type(position) not in [WALL, DEEP]:
             # sheel cannot appear on deep ground or wall
             return ParticleRedShell(race, position, direction, speed, target)
 
@@ -143,6 +143,8 @@ class Particle(object):
 
     def set_position(self, new_position):
         """this function is called whenever the position of the particle changes"""
+        if self.removed:
+            return
         self.position = new_position
         self.sprite.position = self.position.pair()
 
@@ -151,10 +153,14 @@ class Particle(object):
 
     def check_collisions(self):
         """check for collisions with other particles or cars"""
-        for p in self.race.particles:
+        if self.removed:
+            return
+        for p in list(self.race.particles):
             if self.removed:
                 return
-            if not p is self and p.vulnerable and self.position.distance(p.position) <= self.radius + p.radius:
+            if p.removed:
+                continue
+            if p is not self and p.vulnerable and self.position.distance(p.position) <= self.radius + p.radius:
                 self.particle_collision(p)
         for r in self.race.racers:
             if self.removed:
@@ -169,8 +175,11 @@ class Particle(object):
         pass
 
     def remove(self):
+        if self.removed:
+            return
         self.removed = True
-        self.race.particles.remove(self)
+        if self in self.race.particles:
+            self.race.particles.remove(self)
         self.sprite.delete()
 
 
@@ -183,6 +192,8 @@ class ParticleBanana(Particle):
         super(ParticleBanana, self).__init__(race, position, sprite_seq['banana'], 4)
 
     def update(self, dt):
+        if self.removed:
+            return
         self.check_collisions()
 
     def car_collision(self, car):
@@ -202,13 +213,15 @@ class ParticleGreenShell(Particle):
         self.speed = speed
 
     def update(self, dt):
+        if self.removed:
+            return
         track = self.race.track
         current_position = self.position
         move = self.get_direction_vector() * self.speed * dt
         new_position = current_position + move
         path = bresenham(current_position, new_position)
         for i, c in enumerate(path):
-            if track.type(c, hit=True) is WALL:
+            if track.type(c, hit=True) == WALL:
                 # the shell bounces
                 if c[0] != path[i - 1][0]:  # vertical wall
                     self.direction = -self.direction + math.pi
@@ -219,7 +232,7 @@ class ParticleGreenShell(Particle):
                 if self.speed <= 40:
                     return self.remove()  # if the shell becomes too slow it disappears
                 break
-            elif track.type(new_position) is DEEP:
+            elif track.type(new_position) == DEEP:
                 # the shell disappears
                 return self.remove()
         self.set_position(new_position)
@@ -248,9 +261,11 @@ class ParticleRedShell(Particle):
         self.target = target
 
     def update(self, dt):
+        if self.removed:
+            return
         track = self.race.track
         current_position = self.position
-        if not self.target is None:
+        if self.target is not None:
             target_direction = (self.target.position - self.position).angle()
             direction_variation = ((target_direction - self.direction + math.pi) % (2 * math.pi)) - math.pi
             if direction_variation > self.turn * dt:

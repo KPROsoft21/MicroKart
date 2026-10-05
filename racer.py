@@ -6,6 +6,7 @@ import pyglet
 from car import Car
 from graphics import sprite_seq
 from items import ITEMS
+from vector import Vector
 
 
 class Racer(object):
@@ -14,6 +15,8 @@ class Racer(object):
         self.rank = rank
         self.start_slot = rank
         self.is_cpu = rank >= 2
+        self.cpu_lane_offset = ((rank % 3) - 1) * 12
+        self.cpu_target_speed = 165 + (rank % 4) * 18
         self.character = character
         self.car = Car(race, self, character, race.track.start_positions[rank])
         self.photo = pyglet.sprite.Sprite(self.character.photo, batch=race.window.batch)
@@ -58,15 +61,18 @@ class Racer(object):
         beacon_id = track.get_beacon_id(car.position)
         if beacon_id == 255:
             beacon_id = track.get_beacon_id(car.last_ground)
+        if beacon_id == 255:
+            beacon_id = 0
 
         look_ahead = 2
-        if car.speed.norm() > 160:
+        speed = car.speed.norm()
+        if speed > 160:
             look_ahead = 3
         target_id = (beacon_id + look_ahead) % len(track.beacons)
-        target = track.beacons[target_id] * 8
+        target = self.cpu_target_position(target_id)
         if car.position.distance(target) < 40:
             target_id = (target_id + 1) % len(track.beacons)
-            target = track.beacons[target_id] * 8
+            target = self.cpu_target_position(target_id)
 
         target_vector = target - car.position
         desired_direction = target_vector.angle()
@@ -74,11 +80,21 @@ class Racer(object):
 
         self.input_left = direction_error > 0.08
         self.input_right = direction_error < -0.08
-        self.input_brake = abs(direction_error) > 1.2 and car.speed.norm() > 120
-        self.input_accelerate = not self.input_brake or car.speed.norm() < 80
+        self.input_brake = abs(direction_error) > 1.0 and speed > 105
+        self.input_accelerate = (not self.input_brake and speed < self.cpu_target_speed) or speed < 70
 
         if self.item is not ITEMS[0] and self.state.item_rolling == 0:
             self.use_item()
+
+    def cpu_target_position(self, beacon_id):
+        track = self.race.track
+        beacon = track.beacons[beacon_id]
+        next_beacon = track.beacons[(beacon_id + 1) % len(track.beacons)]
+        direction = (next_beacon - beacon).normalize(1.)
+        side = math.sin(self.race.time + self.start_slot) * 4
+        offset = self.cpu_lane_offset + side
+        lane = Vector(-direction.y, direction.x) * offset
+        return beacon * 8 + lane
 
     def get_item(self, item_id=None):
         if self.item is ITEMS[0]:
@@ -102,8 +118,8 @@ class Racer(object):
     def display_times(self):
         def float_to_time(t):
             int_time = int(t * 100)
-            minutes = int_time / 6000
-            seconds = (int_time / 100) % 60
+            minutes = int_time // 6000
+            seconds = (int_time // 100) % 60
             hundredths = int_time % 100
             return "%02d' %02d\" %02d" % (minutes, seconds, hundredths)
 

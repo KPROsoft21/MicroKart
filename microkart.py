@@ -20,7 +20,6 @@ from race import Race
 
 def update(dt):
     window.race.update(dt)
-    window.ui.update()
 
 
 def make_fps_display(window):
@@ -50,7 +49,7 @@ def main():
 
     @window.event
     def on_resize(width, height):
-        window.race.time_label.y = height - 30
+        window.race.resize(width, height)
         window.ui.dark_bg.vertices = (
             0, 0, 0, height, window.ui.mapshift_x, height, 0, 0, window.ui.mapshift_x, height, window.ui.mapshift_x, 0
         )
@@ -58,78 +57,80 @@ def main():
 
     @window.event
     def on_key_press(symbol, modifiers):
-        if symbol is key.Z:
+        if symbol == key.Z:
             # change zoom
             window.ui.change_zoom()
+        elif symbol == key.P:
+            window.race.toggle_pause()
 
         # *** Player 1 controls *** (flags must be updated on key release too)
-        elif symbol is key.UP:  # accelerate
+        elif symbol == key.UP:  # accelerate
             window.race.player1.input_accelerate = True
-        elif symbol is key.DOWN:  # brake
+        elif symbol == key.DOWN:  # brake
             window.race.player1.input_brake = True
-        elif symbol is key.LEFT:  # turn left
+        elif symbol == key.LEFT:  # turn left
             window.race.player1.input_left = True
-        elif symbol is key.RIGHT:  # turn right
+        elif symbol == key.RIGHT:  # turn right
             window.race.player1.input_right = True
-        elif symbol is key.ENTER:  # use item
+        elif symbol == key.ENTER:  # use item
             window.race.player1.use_item()
-        elif symbol is key.SPACE:  # jump
+        elif symbol == key.SPACE:  # jump
             window.race.player1.jump()
         # *** Player 2 controls *** (flags must be updated on key release too)
-        elif symbol is key.W:  # accelerate
+        elif symbol == key.W:  # accelerate
             window.race.player2.input_accelerate = True
-        elif symbol is key.S:  # brake
+        elif symbol == key.S:  # brake
             window.race.player2.input_brake = True
-        elif symbol is key.A:  # turn left
+        elif symbol == key.A:  # turn left
             window.race.player2.input_left = True
-        elif symbol is key.D:  # turn right
+        elif symbol == key.D:  # turn right
             window.race.player2.input_right = True
-        elif symbol is key.LSHIFT:  # use item
+        elif symbol == key.LSHIFT:  # use item
             window.race.player2.use_item()
-        elif symbol is key.X:  # jump
+        elif symbol == key.X:  # jump
             window.race.player2.jump()
         # free items for player 1
-        elif symbol is key._1:
+        elif symbol == key._1:
             window.race.player1.get_item(1)
-        elif symbol is key._2:
+        elif symbol == key._2:
             window.race.player1.get_item(2)
-        elif symbol is key._3:
+        elif symbol == key._3:
             window.race.player1.get_item(3)
-        elif symbol is key._4:
+        elif symbol == key._4:
             window.race.player1.get_item(4)
-        elif symbol is key._5:
+        elif symbol == key._5:
             window.race.player1.get_item(5)
-        elif symbol is key._6:
+        elif symbol == key._6:
             window.race.player1.get_item(6)
-        elif symbol is key._7:
+        elif symbol == key._7:
             window.race.player1.get_item(7)
-        elif symbol is key._8:
+        elif symbol == key._8:
             window.race.player1.get_item(8)
-        elif symbol is key.F3:
+        elif symbol == key.F3:
             pyglet.image.get_buffer_manager().get_color_buffer().save('screenshot.png')
-        elif symbol is key.T:
+        elif symbol == key.T:
             window.race.player1.car.spin()
 
     @window.event
     def on_key_release(symbol, modifiers):
         # *** Player 1 controls ***
-        if symbol is key.UP:
+        if symbol == key.UP:
             window.race.player1.input_accelerate = False
-        elif symbol is key.DOWN:
+        elif symbol == key.DOWN:
             window.race.player1.input_brake = False
-        elif symbol is key.LEFT:
+        elif symbol == key.LEFT:
             window.race.player1.input_left = False
-        elif symbol is key.RIGHT:
+        elif symbol == key.RIGHT:
             window.race.player1.input_right = False
-        # *** Player 2 controls ***
-        if symbol is key.W:
+        elif symbol == key.W:
             window.race.player2.input_accelerate = False
-        elif symbol is key.S:
+        elif symbol == key.S:
             window.race.player2.input_brake = False
-        elif symbol is key.A:
+        elif symbol == key.A:
             window.race.player2.input_left = False
-        elif symbol is key.D:
+        elif symbol == key.D:
             window.race.player2.input_right = False
+        # *** Player 2 controls ***
 
     window.race = Race(window, 13, [TOAD, BOWSER, MARIO, KOOPA, YOSHI, DKJR, TOAD, LUIGI])
     window.ui = UI(window, window.race)

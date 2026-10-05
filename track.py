@@ -163,7 +163,11 @@ class Track(object):
 
     def get_beacon_id(self, position):
         """returns the index of the current beacon"""
-        return self.beacons_map[int(position.x) // 8 + 128 * (127 - int(position.y) // 8)]
+        x = int(position.x) // 8
+        y = int(position.y) // 8
+        if not (0 <= x < 128 and 0 <= y < 128):
+            return 255
+        return self.beacons_map[x + 128 * (127 - y)]
 
     def get_beacon(self, position):
         """returns the beacon that corresponds to the given position"""
