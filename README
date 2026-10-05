@@ -1,0 +1,29 @@
+*** MicroKart ***
+
+MicroKart is a 2D kart racing game inspired by classic Super Mario Kart.
+Race around pixel-art tracks, collect items, dodge hazards, and compete
+against another player or CPU-controlled racers.
+
+The game is written in Python with the Pyglet library. This version has
+been updated for modern Python and macOS compatibility.
+
+Controls:
+
+Player 1:
+- Arrow keys: drive
+- Space: jump
+- Enter: use item
+
+Player 2:
+- W/A/S/D: drive
+- X: jump
+- Left Shift: use item
+
+Other:
+- Z: change zoom
+- F3: save screenshot
+
+Credits:
+Created by kprosoft21.
+
+Original Python 2 game by Zanapher. This is an improved version of his game.
