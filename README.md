@@ -1,4 +1,4 @@
-<h1 align=""center> MicroKart </h1>
+<h1 align="center"> MicroKart </h1>
   
 
 <p align="center">
